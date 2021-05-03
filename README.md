@@ -12,12 +12,6 @@
 
 Wisewallet is an application to track your spending and manage your money developed for the purpose of studying the [technologies used](#Technologies).
 
-- [x] Aula 1
-- [x] Aula 2
-- [x] Aula 3
-- [x] Aula 4
-- [x] Aula 5
-
 ## ✨ Technologies
 
 This project was developed using the following technologies:

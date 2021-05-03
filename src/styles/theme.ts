@@ -6,7 +6,7 @@ const theme = extendTheme({
   ...global,
   config: {
     initialColorMode: "light",
-    useSystemColorMode: true,
+    useSystemColorMode: false,
   },
   fonts: {
     body: "Montserrat, sans-serif",
