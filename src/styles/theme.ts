@@ -11,6 +11,7 @@ const theme = extendTheme({
   fonts: {
     body: "Montserrat, sans-serif",
     heading: "Poppins, sans-serif",
+    mono: 'Fira Mono, monospace',
   },
   colors
 },);

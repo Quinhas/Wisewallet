@@ -30,7 +30,7 @@ export function Tabs() {
   return (
     <>
       <Flex
-        position={"fixed"}
+        position={"sticky"}
         w={"full"}
         bottom={0}
         align={"center"}

@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
       <Navbar/>
-        <Component {...pageProps} />
+        <Component {...pageProps}/>
       <Tabs/>
     </ChakraProvider>
   );
