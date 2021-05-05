@@ -37,7 +37,7 @@ export function Tabs() {
         px={"2rem"}
         h={"4rem"}
         backgroundColor={colorMode === "light" ? "white" : "black"}
-        shadow={"md"}
+        boxShadow={"0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)"}
         justify={"space-between"}
       >
         {tabs.map((tab) => {

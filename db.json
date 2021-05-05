@@ -1,0 +1,65 @@
+{
+  "users": [
+    {
+      "id": 0,
+      "name": "Lucas Santana",
+      "email": "ln.santana08@gmail.com",
+      "birthdate": "2002-08-02",
+      "currency": "BRL",
+      "language": "en",
+      "photoURL": "",
+      "accounts": [
+        {
+          "type": "Cash",
+          "balance": 8.00
+        },
+        {
+          "type": "Bank",
+          "balance": 100,
+          "name": "PicPay"
+        },
+        {
+          "type": "Others",
+          "balance": 20.12
+        }
+      ],
+      "expenses": [
+        {
+          "date": "2021-05-01T12:07:35-03:00",
+          "title": "Nubank Invoice",
+          "account": "Nubank Debit",
+          "category": "Credit Card",
+          "value": 196.92
+        },
+        {
+          "date": "2021-04-28T12:18:20-03:00",
+          "title": "99app *99APP",
+          "account": "Nubank Credit",
+          "category": "Transport",
+          "value": 7.10
+        },
+        {
+          "date": "2021-04-24T12:34:20-03:00",
+          "title": "99app *99APP",
+          "account": "Nubank Credit",
+          "category": "Transport",
+          "value": 7.10
+        },
+        {
+          "date": "2021-04-24T14:02:20-03:00",
+          "title": "99app *99APP",
+          "account": "Nubank Credit",
+          "category": "Transport",
+          "value": 6.20
+        },
+        {
+          "date": "2021-04-24T21:49:20-03:00",
+          "title": "iFood",
+          "account": "Nubank Credit",
+          "category": "Food",
+          "value": 52.90
+        }
+      ]
+    }
+  ]
+}

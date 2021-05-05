@@ -18,29 +18,73 @@ export function AccountCard({
   iconBgColor,
   iconColor,
   bgColor,
-  name
+  name,
 }: AccountCardProps) {
   const { colorMode } = useColorMode();
   return (
-    <Flex bgColor={bgColor || colorMode == 'light' ? "white" : 'black'} p={"1rem"} gridGap={"0.5rem"} direction={'column'} borderRadius={'md'} boxShadow={'md'} flex={'1 1 auto'}>
+    <Flex
+      bgColor={bgColor || colorMode == "light" ? "white" : "black"}
+      p={"1rem"}
+      gridGap={"0.5rem"}
+      direction={"column"}
+      borderRadius={"md"}
+      boxShadow={"md"}
+      flex={"1 1 auto"}
+    >
       {type === "Cash" && (
-        <Flex align={'center'} justify={'center'} bgColor={iconBgColor || 'primary.600'} w={'2rem'} h={'2rem'} borderRadius={'md'} color={iconColor || 'white'}>
+        <Flex
+          align={"center"}
+          justify={"center"}
+          bgColor={iconBgColor || "primary.600"}
+          w={"2rem"}
+          h={"2rem"}
+          borderRadius={"md"}
+          color={iconColor || "white"}
+        >
           <Icon as={FaCoins} />
         </Flex>
       )}
       {type === "Bank" && (
-        <Flex align={'center'} justify={'center'} bgColor={iconBgColor || 'primary.600'} w={'2rem'} h={'2rem'} borderRadius={'md'} color={iconColor || 'white'}>
+        <Flex
+          align={"center"}
+          justify={"center"}
+          bgColor={iconBgColor || "primary.600"}
+          w={"2rem"}
+          h={"2rem"}
+          borderRadius={"md"}
+          color={iconColor || "white"}
+        >
           <Icon as={FaUniversity} />
         </Flex>
       )}
       {type === "Others" && (
-        <Flex align={'center'} justify={'center'} bgColor={iconBgColor || 'primary.600'} w={'2rem'} h={'2rem'} borderRadius={'md'} color={iconColor || 'white'}>
+        <Flex
+          align={"center"}
+          justify={"center"}
+          bgColor={iconBgColor || "primary.600"}
+          w={"2rem"}
+          h={"2rem"}
+          borderRadius={"md"}
+          color={iconColor || "white"}
+        >
           <Icon as={FaPiggyBank} />
         </Flex>
       )}
       <Box>
-        <Text fontFamily={'mono'} fontSize={'1rem'} color={'gray.400'} textTransform={'uppercase'}>{name || type}</Text>
-        <Text fontSize={'1.5rem'} fontWeight={'bold'}>{new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(value)}</Text>
+        <Text
+          fontFamily={"mono"}
+          fontSize={"1rem"}
+          color={"gray.400"}
+          textTransform={"uppercase"}
+        >
+          {name || type}
+        </Text>
+        <Text fontSize={"1.5rem"} fontWeight={"bold"}>
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(value)}
+        </Text>
       </Box>
     </Flex>
   );
