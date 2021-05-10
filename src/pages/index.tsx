@@ -2,12 +2,33 @@ import Icon from "@chakra-ui/icon";
 import { Flex, Text } from "@chakra-ui/layout";
 import { formatISO } from "date-fns";
 import { GetStaticProps } from "next";
+import { useEffect, useState } from "react";
+import CountUp from "react-countup";
 import { AccountCard } from "../components/AccountCard";
 import { CardPieChart } from "../components/CardPieChart";
 import { api } from "../services/api";
 
-export default function Home(props) {
-  console.log(props);
+type IUser = {
+  id: number;
+  name: string;
+  email: string;
+  birthdate: string;
+  currency: string;
+  language: string;
+  photoURL: string;
+  accounts: {
+    type: "Cash" | "Bank" | "Others";
+    balance: number;
+    name?: string;
+  }[];
+};
+
+type HomeProps = {
+  user: IUser;
+};
+
+export default function Home({ user }: HomeProps) {
+  const [balance, setBalance] = useState<number>(0);
   const data = [
     {
       name: "Expenses",
@@ -47,6 +68,11 @@ export default function Home(props) {
     },
   ];
 
+  useEffect(() => {
+    let balance = user.accounts.reduce((a, b) => a + b.balance, 0);
+    setBalance(balance);
+  }, []);
+
   return (
     <Flex
       py={"1rem"}
@@ -57,13 +83,17 @@ export default function Home(props) {
       {/* Greeting & Balance */}
       <Flex direction="column" px={"1rem"}>
         <Text fontWeight="medium" fontSize={"1.5rem"}>
-          Good morning, {props.data.name.split(' ')[0]}!
+          Good morning, {user.name.split(" ")[0]}!
         </Text>
         <Flex justify={"space-between"} fontSize={"1.5rem"}>
           <Text color={"gray.500"}>Balance:</Text>
           <Flex align={"center"} gridGap={"0.5rem"}>
             <Text color={"primary.600"} fontWeight="bold">
-              R$ 128,12
+              {/* {new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(balance)} */}
+              <CountUp preserveValue={true} end={balance} decimals={2} decimal="," prefix="R$ " duration={0.5} />
             </Text>
           </Flex>
         </Flex>
@@ -78,9 +108,16 @@ export default function Home(props) {
         overflowX={"auto"}
         justify={"space-between"}
       >
-        <AccountCard type={"Cash"} value={8} />
-        <AccountCard type={"Bank"} name={"PicPay"} value={100} />
-        <AccountCard type={"Others"} value={20.12} />
+        {user.accounts.map((account, index) => {
+          return (
+            <AccountCard
+              key={index}
+              type={account.type}
+              value={account.balance}
+              name={account.name || null}
+            />
+          );
+        })}
       </Flex>
 
       <Flex
@@ -101,8 +138,8 @@ export const getStaticProps: GetStaticProps = async () => {
   const { data } = await api.get("users/0");
 
   return {
-		props: {
-			data
-		}
-	};
+    props: {
+      user: data,
+    },
+  };
 };

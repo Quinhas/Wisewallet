@@ -1,6 +1,7 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import Icon from "@chakra-ui/icon";
 import { Box, Flex, Text } from "@chakra-ui/layout";
+import CountUp from "react-countup";
 import { FaCoins, FaUniversity, FaPiggyBank } from "react-icons/fa";
 
 type AccountCardProps = {

@@ -11,16 +11,31 @@
       "accounts": [
         {
           "type": "Cash",
-          "balance": 8.00
+          "balance": 280.00
         },
         {
           "type": "Bank",
-          "balance": 100,
+          "balance": 326.67,
           "name": "PicPay"
         },
         {
+          "type": "Bank",
+          "balance": 17.50,
+          "name": "Nubank"
+        },
+        {
+          "type": "Bank",
+          "balance": 0,
+          "name": "BB"
+        },
+        {
+          "type": "Bank",
+          "balance": 0,
+          "name": "Binance"
+        },
+        {
           "type": "Others",
-          "balance": 20.12
+          "balance": 0
         }
       ],
       "expenses": [
