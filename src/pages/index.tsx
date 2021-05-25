@@ -1,76 +1,48 @@
-import Icon from "@chakra-ui/icon";
-import { Flex, Text } from "@chakra-ui/layout";
-import { formatISO } from "date-fns";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { GetStaticProps } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CountUp from "react-countup";
-import { AccountCard } from "../components/AccountCard";
-import { CardPieChart } from "../components/CardPieChart";
-import { api } from "../services/api";
-
-type IUser = {
-  id: number;
-  name: string;
-  email: string;
-  birthdate: string;
-  currency: string;
-  language: string;
-  photoURL: string;
-  accounts: {
-    type: "Cash" | "Bank" | "Others";
-    balance: number;
-    name?: string;
-  }[];
-};
+import { AccountCard } from "@components/AccountCard";
+import { api } from "@services/api";
+import { getHours, isAfter, isBefore, parseISO } from "date-fns";
+import { IUser } from "src/types/IUser";
+import { ListItem } from "@components/ListItem";
+import * as localForage from "localforage";
 
 type HomeProps = {
   user: IUser;
+  recent: any;
+  coming: any;
 };
 
-export default function Home({ user }: HomeProps) {
+export default function Home({ user, recent, coming }: HomeProps) {
   const [balance, setBalance] = useState<number>(0);
-  const data = [
-    {
-      name: "Expenses",
-      value: 6000,
-      color: "var(--chakra-colors-danger-600)",
-    },
-    {
-      name: "Incomes",
-      value: 8000,
-      color: "var(--chakra-colors-success-600)",
-    },
-  ];
-
-  const incomes = [
-    {
-      name: "Eventual",
-      value: 2000,
-      color: "var(--chakra-colors-success-500)",
-    },
-    {
-      name: "Recurrent",
-      value: 6000,
-      color: "var(--chakra-colors-success-700)",
-    },
-  ];
-
-  const expenses = [
-    {
-      name: "Eventual",
-      value: 1200,
-      color: "var(--chakra-colors-danger-500)",
-    },
-    {
-      name: "Recurrent",
-      value: 4800,
-      color: "var(--chakra-colors-danger-700)",
-    },
-  ];
 
   useEffect(() => {
     let balance = user.accounts.reduce((a, b) => a + b.balance, 0);
     setBalance(balance);
+    localForage.setItem('wisewallet_language', user.language);
+  }, []);
+
+  const greeting = useMemo(() => {
+    const hour = getHours(new Date());
+    if (hour > 18) {
+      return "Good evening";
+    }
+
+    if (hour > 11) {
+      return "Good afternoon";
+    }
+
+    if (hour > 5) {
+      return "Good morning";
+    }
+
+    if (hour >= 0) {
+      return "Good evening";
+    }
+
+    return "Hello";
   }, []);
 
   return (
@@ -83,19 +55,20 @@ export default function Home({ user }: HomeProps) {
       {/* Greeting & Balance */}
       <Flex direction="column" px={"1rem"}>
         <Text fontWeight="medium" fontSize={"1.5rem"}>
-          Good morning, {user.name.split(" ")[0]}!
+          {greeting}, {user.name.split(" ")[0]}!
         </Text>
         <Flex justify={"space-between"} fontSize={"1.5rem"}>
           <Text color={"gray.500"}>Balance:</Text>
-          <Flex align={"center"} gridGap={"0.5rem"}>
-            <Text color={"primary.600"} fontWeight="bold">
-              {/* {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(balance)} */}
-              <CountUp preserveValue={true} end={balance} decimals={2} decimal="," prefix="R$ " duration={0.5} />
-            </Text>
-          </Flex>
+          <Text color={"primary.600"} fontWeight="bold">
+            <CountUp
+              preserveValue={true}
+              end={balance}
+              decimals={2}
+              decimal=","
+              prefix="R$ "
+              duration={0.5}
+            />
+          </Text>
         </Flex>
       </Flex>
 
@@ -107,6 +80,7 @@ export default function Home({ user }: HomeProps) {
         pb={"0.5rem"}
         overflowX={"auto"}
         justify={"space-between"}
+        shrink={1}
       >
         {user.accounts.map((account, index) => {
           return (
@@ -120,15 +94,52 @@ export default function Home({ user }: HomeProps) {
         })}
       </Flex>
 
-      <Flex
-        flex={"auto 1 auto"}
-        direction={{ base: "column", lg: "row" }}
-        gridGap={{ base: "1.5rem", lg: "0" }}
-        justify={"space-between"}
-      >
-        <CardPieChart title={"Inc & Exp"} chartSide={"end"} data={data} />
-        <CardPieChart title={"Incomes"} chartSide={"start"} data={incomes} />
-        <CardPieChart title={"Expenses"} chartSide={"start"} data={expenses} />
+      {coming.length != 0 && (
+        <Flex direction={"column"}>
+          <Heading ps={"1rem"} fontSize={"1.6rem"} mb={"0.5rem"}>
+            Coming
+          </Heading>
+          <Box opacity={'0.6'}>
+          {coming.map((activity, index) => {
+            return (
+              <ListItem
+                key={index}
+                type={activity.listType}
+                title={activity?.title}
+                account={activity?.account}
+                date={activity?.date}
+                value={activity.value}
+                category={activity?.category}
+                layout={"home"}
+                origin={activity?.origin}
+                destination={activity?.destination}
+              />
+            );
+          })}
+          </Box>
+        </Flex>
+      )}
+
+      <Flex direction={"column"}>
+        <Heading ps={"1rem"} fontSize={"1.6rem"} mb={"0.5rem"}>
+          Recent
+        </Heading>
+        {recent.map((activity, index) => {
+          return (
+            <ListItem
+              key={index}
+              type={activity.listType}
+              title={activity?.title}
+              account={activity?.account}
+              date={activity?.date}
+              value={activity.value}
+              category={activity?.category}
+              layout={"home"}
+              origin={activity?.origin}
+              destination={activity?.destination}
+            />
+          );
+        })}
       </Flex>
     </Flex>
   );
@@ -136,10 +147,67 @@ export default function Home({ user }: HomeProps) {
 
 export const getStaticProps: GetStaticProps = async () => {
   const { data } = await api.get("users/0");
+  const comingIncomes = [];
+  const comingExpenses = [];
+  const comingTransfers = [];
+  const recentIncomes = [];
+  const recentExpenses = [];
+  const recentTransfers = [];
+  data.incomes.splice(0, 5).forEach((income) => {
+    if (isBefore(parseISO(income.date), new Date())) {
+      recentIncomes.push({ ...income, listType: "Income" });
+    }
+    if (isAfter(parseISO(income.date), new Date())) {
+      comingIncomes.push({ ...income, listType: "Income" });
+    }
+  });
+
+  data.expenses.splice(0, 5).forEach((expense) => {
+    if (isBefore(parseISO(expense.date), new Date())) {
+      recentExpenses.push({ ...expense, listType: "Expense" });
+    }
+    if (isAfter(parseISO(expense.date), new Date())) {
+      comingExpenses.push({ ...expense, listType: "Expense" });
+    }
+  });
+  data.transfers.splice(0, 5).map((transfer) => {
+    if (isBefore(parseISO(transfer.date), new Date())) {
+      recentTransfers.push({ ...transfer, listType: "Transfer" });
+    }
+    if (isAfter(parseISO(transfer.date), new Date())) {
+      comingTransfers.push({ ...transfer, listType: "Transfer" });
+    }
+  });
+
+  const recent = [...recentIncomes, ...recentExpenses, ...recentTransfers]
+    .sort((a, b) => {
+      if (a.date < b.date) {
+        return 1;
+      }
+      if (a.date > b.date) {
+        return -1;
+      }
+      return 0;
+    })
+    .splice(0, 5);
+
+  const coming = [...comingIncomes, ...comingExpenses, ...comingTransfers]
+    .sort((a, b) => {
+      if (a.date < b.date) {
+        return 1;
+      }
+      if (a.date > b.date) {
+        return -1;
+      }
+      return 0;
+    })
+    .splice(0, 5);
 
   return {
     props: {
       user: data,
+      recent: recent,
+      coming: coming,
     },
   };
 };

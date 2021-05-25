@@ -6,21 +6,22 @@
       "email": "ln.santana08@gmail.com",
       "birthdate": "2002-08-02",
       "currency": "BRL",
-      "language": "en",
+      "language": "pt-BR",
       "photoURL": "",
+      "lastPasswordChange": "2021-04-21T14:02:20-03:00",
       "accounts": [
         {
           "type": "Cash",
-          "balance": 280.00
+          "balance": 150
         },
         {
           "type": "Bank",
-          "balance": 326.67,
+          "balance": 164.39,
           "name": "PicPay"
         },
         {
           "type": "Bank",
-          "balance": 17.50,
+          "balance": 0,
           "name": "Nubank"
         },
         {
@@ -44,35 +45,71 @@
           "title": "Nubank Invoice",
           "account": "Nubank Debit",
           "category": "Credit Card",
-          "value": 196.92
+          "value": 196.92,
+          "type": "Eventual"
         },
         {
           "date": "2021-04-28T12:18:20-03:00",
           "title": "99app *99APP",
           "account": "Nubank Credit",
           "category": "Transport",
-          "value": 7.10
+          "value": 7.1,
+          "type": "Eventual"
         },
         {
           "date": "2021-04-24T12:34:20-03:00",
           "title": "99app *99APP",
           "account": "Nubank Credit",
           "category": "Transport",
-          "value": 7.10
+          "value": 7.1,
+          "type": "Eventual"
         },
         {
           "date": "2021-04-24T14:02:20-03:00",
           "title": "99app *99APP",
           "account": "Nubank Credit",
           "category": "Transport",
-          "value": 6.20
+          "value": 6.2,
+          "type": "Eventual"
         },
         {
           "date": "2021-04-24T21:49:20-03:00",
           "title": "iFood",
           "account": "Nubank Credit",
           "category": "Food",
-          "value": 52.90
+          "value": 52.9,
+          "type": "Eventual"
+        }
+      ],
+      "incomes": [
+        {
+          "date": "2021-06-05T12:07:35-03:00",
+          "title": "Salary",
+          "account": "Nubank Debit",
+          "value": 1200.00,
+          "type": "Recurrent"
+        },
+        {
+          "date": "2021-05-01T12:05:35-03:00",
+          "title": "Salary",
+          "account": "Nubank Debit",
+          "value": 1200.00,
+          "type": "Recurrent"
+        },
+        {
+          "date": "2021-04-23T12:07:35-03:00",
+          "title": "Freela",
+          "account": "Picpay",
+          "value": 750.00,
+          "type": "Eventual"
+        }
+      ],
+      "transfers": [
+        {
+          "date": "2021-04-23T12:10:35-03:00",
+          "origin": "Picpay",
+          "destination": "Nubank Debit",
+          "value": 750.00
         }
       ]
     }

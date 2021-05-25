@@ -1,7 +1,7 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import Icon from "@chakra-ui/icon";
 import { Flex, Text } from "@chakra-ui/layout";
-import { FaUserCircle, FaHome, FaChartLine } from "react-icons/fa";
+import { FaUserCircle, FaHome, FaChartPie, FaReceipt } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -21,9 +21,14 @@ export function Tabs() {
       href: "/",
     },
     {
-      icon: FaChartLine,
+      icon: FaReceipt,
       text: "History",
       href: "/history",
+    },
+    {
+      icon: FaChartPie,
+      text: "Charts",
+      href: "/charts",
     },
   ];
 

@@ -1,6 +1,14 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { useColorMode } from "@chakra-ui/color-mode";
 import { Flex, Heading, Text } from "@chakra-ui/layout";
+import { api } from "@services/api";
+import { Locale } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { enUS, ptBR } from "date-fns/locale";
+
+import { GetStaticProps } from "next";
+import { useEffect, useMemo, useState } from "react";
+import { IUser } from "src/types/IUser";
 
 type InfoProps = {
   title: string;
@@ -28,7 +36,31 @@ const Info = ({ title, value }: InfoProps) => {
   );
 };
 
-export default function Profile() {
+type ProfileProps = {
+  user: IUser;
+};
+
+export default function Profile({ user }: ProfileProps) {
+  const [locale, setLocale] = useState<Locale>(null);
+
+  const getLocale = async () => {
+    const locale: Locale = (await import(`date-fns/locale/${user.language}/index.js`)).default;
+    setLocale(locale)
+  }
+
+  useEffect(() => {
+    getLocale();
+  }, [])
+
+  const language = useMemo(() => {
+    switch (user.language) {
+      case "en-US":
+        return "English";
+      case "pt-BR":
+        return "Português";
+    }
+  }, [user.language]);
+
   return (
     <Flex
       py={"1rem"}
@@ -48,18 +80,31 @@ export default function Profile() {
           bg={"primary.600"}
           w={"9rem"}
           h={"9rem"}
-          src="https://bit.ly/broken-link"
+          src={user.photoURL}
         />
         <Heading fontSize={"1.875rem"} fontWeight={"semibold"}>
-          Hi, Lucas!
+          Hi, {user.name.split(" ")[0]}!
         </Heading>
       </Flex>
-      <Info title={"Name"} value={"Lucas Santana Nunes"} />
-      <Info title={"E-mail"} value={"ln.santana08@gmail.com"} />
-      <Info title={"Password"} value={"Last change on: April 24, 2021"} />
-      <Info title={"Birthdate"} value={"02/08/2002"} />
-      <Info title={"Currency"} value={"BRL"} />
-      <Info title={"Language"} value={"English"} />
+      <Info title={"Name"} value={user.name} />
+      <Info title={"E-mail"} value={user.email} />
+      <Info title={"Password"} value={`Last change on: ${format(parseISO(user.lastPasswordChange), 'PPpp', {locale: locale})}`} />
+      <Info
+        title={"Birthdate"}
+        value={String(format(parseISO(user.birthdate), "P", {locale: locale}))}
+      />
+      <Info title={"Currency"} value={user.currency} />
+      <Info title={"Language"} value={language} />
     </Flex>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const { data } = await api.get("users/0");
+
+  return {
+    props: {
+      user: data,
+    },
+  };
+};

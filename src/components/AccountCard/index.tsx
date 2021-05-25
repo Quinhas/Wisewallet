@@ -1,7 +1,6 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import Icon from "@chakra-ui/icon";
 import { Box, Flex, Text } from "@chakra-ui/layout";
-import CountUp from "react-countup";
 import { FaCoins, FaUniversity, FaPiggyBank } from "react-icons/fa";
 
 type AccountCardProps = {
@@ -42,7 +41,7 @@ export function AccountCard({
           borderRadius={"md"}
           color={iconColor || "white"}
         >
-          <Icon as={FaCoins} />
+          <Icon as={FaCoins} w={"1.3rem"} h={"1.3rem"} />
         </Flex>
       )}
       {type === "Bank" && (
@@ -55,7 +54,7 @@ export function AccountCard({
           borderRadius={"md"}
           color={iconColor || "white"}
         >
-          <Icon as={FaUniversity} />
+          <Icon as={FaUniversity} w={"1.3rem"} h={"1.3rem"} />
         </Flex>
       )}
       {type === "Others" && (
@@ -68,7 +67,7 @@ export function AccountCard({
           borderRadius={"md"}
           color={iconColor || "white"}
         >
-          <Icon as={FaPiggyBank} />
+          <Icon as={FaPiggyBank} w={"1.3rem"} h={"1.3rem"} />
         </Flex>
       )}
       <Box>

@@ -10,7 +10,7 @@ function Error({ statusCode }) {
       basis={"100%"}
       align={"center"}
       justify={"center"}
-      gridGap={"0.5rem"}
+      gridGap={"0.8rem"}
     >
       <Heading>{statusCode}</Heading>
       <Center height="50px">
