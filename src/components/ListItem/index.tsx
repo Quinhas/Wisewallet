@@ -14,6 +14,7 @@ type ListItemProps = {
   destination?: string;
   date: string;
   layout: string;
+  coming?: boolean
 };
 
 const color = {
@@ -32,6 +33,7 @@ export function ListItem({
   destination,
   date,
   layout,
+  coming
 }: ListItemProps) {
   const { colorMode } = useColorMode();
 
@@ -58,6 +60,7 @@ export function ListItem({
         borderLeftColor={color[type]}
         borderBottomWidth={"0.5px"}
         borderBottomColor={colorMode === "light" ? "gray.200" : "gray.700"}
+        opacity={coming ? "0.6" : '1'}
       >
         <Flex
           grow={1}

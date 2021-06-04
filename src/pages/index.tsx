@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
+import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/layout";
 import { GetStaticProps } from "next";
 import { useEffect, useMemo, useState } from "react";
 import CountUp from "react-countup";
@@ -8,6 +8,7 @@ import { getHours, isAfter, isBefore, parseISO } from "date-fns";
 import { IUser } from "src/types/IUser";
 import { ListItem } from "@components/ListItem";
 import * as localForage from "localforage";
+import { useColorMode } from "@chakra-ui/color-mode";
 
 type HomeProps = {
   user: IUser;
@@ -17,29 +18,42 @@ type HomeProps = {
 
 export default function Home({ user, recent, coming }: HomeProps) {
   const [balance, setBalance] = useState<number>(0);
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     let balance = user.accounts.reduce((a, b) => a + b.balance, 0);
     setBalance(balance);
-    localForage.setItem('wisewallet_language', user.language);
+    localForage.setItem("wisewallet_language", user.language);
   }, []);
 
   const greeting = useMemo(() => {
     const hour = getHours(new Date());
     if (hour > 18) {
-      return "Good evening";
+      return {
+        "pt-BR": "Boa noite",
+        "en-US": "Good evening",
+      };
     }
 
     if (hour > 11) {
-      return "Good afternoon";
+      return {
+        "pt-BR": "Boa tarde",
+        "en-US": "Good afternoon",
+      };
     }
 
     if (hour > 5) {
-      return "Good morning";
+      return {
+        "pt-BR": "Bom dia",
+        "en-US": "Good morning",
+      };
     }
 
     if (hour >= 0) {
-      return "Good evening";
+      return {
+        "pt-BR": "Boa noite",
+        "en-US": "Good evening",
+      };
     }
 
     return "Hello";
@@ -55,10 +69,13 @@ export default function Home({ user, recent, coming }: HomeProps) {
       {/* Greeting & Balance */}
       <Flex direction="column" px={"1rem"}>
         <Text fontWeight="medium" fontSize={"1.5rem"}>
-          {greeting}, {user.name.split(" ")[0]}!
+          {greeting[user.language]}, {user.name.split(" ")[0]}!
         </Text>
         <Flex justify={"space-between"} fontSize={"1.5rem"}>
-          <Text color={"gray.500"}>Balance:</Text>
+          <Text color={"gray.500"}>
+            {user.language === "pt-BR" && "Saldo:"}
+            {user.language === "en-US" && "Balance:"}
+          </Text>
           <Text color={"primary.600"} fontWeight="bold">
             <CountUp
               preserveValue={true}
@@ -81,6 +98,11 @@ export default function Home({ user, recent, coming }: HomeProps) {
         overflowX={"auto"}
         justify={"space-between"}
         shrink={1}
+        css={{
+          "&::-webkit-scrollbar": {
+            display: 'none'
+          }
+        }}
       >
         {user.accounts.map((account, index) => {
           return (
@@ -95,34 +117,40 @@ export default function Home({ user, recent, coming }: HomeProps) {
       </Flex>
 
       {coming.length != 0 && (
-        <Flex direction={"column"}>
-          <Heading ps={"1rem"} fontSize={"1.6rem"} mb={"0.5rem"}>
-            Coming
-          </Heading>
-          <Box opacity={'0.6'}>
-          {coming.map((activity, index) => {
-            return (
-              <ListItem
-                key={index}
-                type={activity.listType}
-                title={activity?.title}
-                account={activity?.account}
-                date={activity?.date}
-                value={activity.value}
-                category={activity?.category}
-                layout={"home"}
-                origin={activity?.origin}
-                destination={activity?.destination}
-              />
-            );
-          })}
-          </Box>
-        </Flex>
+        <>
+          <Flex direction={"column"} mx={"1rem"}>
+            <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
+              {user.language === "pt-BR" && "Próximo"}
+              {user.language === "en-US" && "Coming"}
+            </Heading>
+            <Box>
+              {coming.map((activity, index) => {
+                return (
+                  <ListItem
+                    key={index}
+                    type={activity.listType}
+                    title={activity?.title}
+                    account={activity?.account}
+                    date={activity?.date}
+                    value={activity.value}
+                    category={activity?.category}
+                    layout={"home"}
+                    origin={activity?.origin}
+                    destination={activity?.destination}
+                    coming={isAfter(parseISO(activity.date), new Date())}
+                  />
+                );
+              })}
+            </Box>
+          </Flex>
+          <Divider w={'calc(100% - 2rem)'} mx={'1rem'} mt={"0.6rem"} />
+        </>
       )}
 
-      <Flex direction={"column"}>
-        <Heading ps={"1rem"} fontSize={"1.6rem"} mb={"0.5rem"}>
-          Recent
+      <Flex direction={"column"} mx={"1rem"}>
+        <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
+          {user.language === "pt-BR" && "Recente"}
+          {user.language === "en-US" && "Recent"}
         </Heading>
         {recent.map((activity, index) => {
           return (
@@ -153,6 +181,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const recentIncomes = [];
   const recentExpenses = [];
   const recentTransfers = [];
+
   data.incomes.splice(0, 5).forEach((income) => {
     if (isBefore(parseISO(income.date), new Date())) {
       recentIncomes.push({ ...income, listType: "Income" });
@@ -170,6 +199,7 @@ export const getStaticProps: GetStaticProps = async () => {
       comingExpenses.push({ ...expense, listType: "Expense" });
     }
   });
+  
   data.transfers.splice(0, 5).map((transfer) => {
     if (isBefore(parseISO(transfer.date), new Date())) {
       recentTransfers.push({ ...transfer, listType: "Transfer" });

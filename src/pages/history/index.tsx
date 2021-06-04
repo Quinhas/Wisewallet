@@ -1,6 +1,6 @@
 import Icon from "@chakra-ui/icon";
-import { Flex, Text } from "@chakra-ui/layout";
-import { formatISO, getMonth, getYear } from "date-fns";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
+import { format, formatISO, getMonth, getYear, isAfter, parseISO } from "date-fns";
 import { GetStaticProps } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CountUp from "react-countup";
@@ -9,6 +9,7 @@ import { CardPieChart } from "@components/CardPieChart";
 import { Filter } from "@components/Filter";
 import { api } from "@services/api";
 import monthsList from "@utils/months";
+import { ListItem } from "@components/ListItem";
 
 type ExpenseProps = {
   date: string;
@@ -27,6 +28,13 @@ type IncomeProps = {
   type: string;
 };
 
+type TransferProps = {
+  date: string;
+  origin: string;
+  destination: string;
+  value: number;
+};
+
 type IUser = {
   id: number;
   name: string;
@@ -42,13 +50,27 @@ type IUser = {
   }[];
   expenses: ExpenseProps[];
   incomes: IncomeProps[];
+  transfers: TransferProps[];
 };
 
-type HomeProps = {
+type IItems = {
+  date?: string;
+  title?: string;
+  account?: string;
+  category?: string;
+  value?: number;
+  type?: string;
+  origin?: string;
+  destination?: string;
+  listType: "Income" | "Expense" | "Transfer";
+};
+
+type HistoryProps = {
   user: IUser;
+  items: IItems[];
 };
 
-export default function History({ user }: HomeProps) {
+export default function History({ user, items }: HistoryProps) {
   const [selectedMonth, setSelectedMonth] = useState<number>(
     getMonth(new Date()) + 1
   );
@@ -82,122 +104,73 @@ export default function History({ user }: HomeProps) {
     });
   }, []);
 
-  const totalExpenses = useMemo(() => {
-    let total: number = 0;
-    user.expenses.forEach((item) => {
-      let month = getMonth(new Date(item.date)) + 1;
-      let year = getYear(new Date(item.date));
-      if (month === selectedMonth && year === selectedYear) {
-        try {
-          total += Number(item.value);
-        } catch (error) {
-          throw new Error("Invalid amount! Value must be a number");
-        }
+  const listItems = useMemo(() => {
+    const incomesFiltered = user.incomes.filter((income) => {
+      const date = new Date(income.date);
+      const dateMonth = getMonth(date) + 1;
+      const dateYear = getYear(date);
+      return selectedMonth === dateMonth && selectedYear === dateYear;
+    });
+    const incomes: IItems[] = incomesFiltered.map((income) => {
+      return { ...income, listType: "Income" };
+    });
+
+    const expensesFiltered = user.expenses.filter((expense) => {
+      const date = new Date(expense.date);
+      const dateMonth = getMonth(date) + 1;
+      const dateYear = getYear(date);
+      return selectedMonth === dateMonth && selectedYear === dateYear;
+    });
+    const expenses: IItems[] = expensesFiltered.map((expense) => {
+      return { ...expense, listType: "Expense" };
+    });
+
+    const transfersFiltered = user.transfers.filter((transfer) => {
+      const date = new Date(transfer.date);
+      const dateMonth = getMonth(date) + 1;
+      const dateYear = getYear(date);
+      return selectedMonth === dateMonth && selectedYear === dateYear;
+    });
+    const transfers: IItems[] = transfersFiltered.map((transfer) => {
+      return { ...transfer, listType: "Transfer" };
+    });
+
+    const items = [...incomes, ...expenses, ...transfers].sort((a, b) => {
+      if (a.date < b.date) {
+        return 1;
+      }
+      if (a.date > b.date) {
+        return -1;
+      }
+      return 0;
+    });
+    return items;
+  }, [selectedMonth, selectedYear]);
+
+  const dates = useMemo(() => {
+    let uniqueDates: string[] = [];
+    let dates: { date: string; dateFormatted: string }[] = [];
+
+    listItems.forEach((item) => {
+      const date = format(new Date(item.date), "P");
+      if (!uniqueDates.includes(date)) {
+        uniqueDates.push(date);
+        dates.push({
+          date: date,
+          dateFormatted: format(new Date(item.date), "PP"),
+        });
       }
     });
-    return total;
-  }, [selectedMonth, selectedYear]);
 
-  const totalIncomes = useMemo(() => {
-    let total: number = 0;
-    user.incomes.forEach((item) => {
-      let month = getMonth(new Date(item.date)) + 1;
-      let year = getYear(new Date(item.date));
-      if (month === selectedMonth && year === selectedYear) {
-        try {
-          total += Number(item.value);
-        } catch (error) {
-          throw new Error("Invalid amount! Value must be a number");
-        }
+    return dates.sort((a, b) => {
+      if (a.date < b.date) {
+        return 1;
       }
+      if (a.date > b.date) {
+        return -1;
+      }
+      return 0;
     });
-    return total;
-  }, [selectedMonth, selectedYear]);
-
-  const relationExpensesIncomes = useMemo(() => {
-    const data = [
-      {
-        name: "Incomes",
-        value: totalIncomes,
-        color: "var(--chakra-colors-success-600)",
-      },
-      {
-        name: "Expenses",
-        value: totalExpenses,
-        color: "var(--chakra-colors-danger-600)",
-      },
-    ];
-    return data;
-  }, [totalIncomes, totalExpenses]);
-
-  const relationExpenses = useMemo(() => {
-    let amountRecurrent = 0;
-    let amountEventual = 0;
-
-    user.expenses
-      .filter((expense) => {
-        const date = new Date(expense.date);
-        const month = getMonth(date) + 1;
-        const year = getYear(date);
-
-        return month === selectedMonth && year === selectedYear;
-      })
-      .forEach((expense) => {
-        if (expense.type.toLowerCase() === "recurrent") {
-          return (amountRecurrent += Number(expense.value));
-        }
-        if (expense.type.toLowerCase() === "eventual") {
-          return (amountEventual += Number(expense.value));
-        }
-      });
-
-    return [
-      {
-        name: "Recurrent",
-        value: amountRecurrent,
-        color: "var(--chakra-colors-danger-700)",
-      },
-      {
-        name: "Eventual",
-        value: amountEventual,
-        color: "var(--chakra-colors-danger-500)",
-      },
-    ];
-  }, [selectedMonth, selectedYear]);
-
-  const relationIncomes = useMemo(() => {
-    let amountRecurrent = 0;
-    let amountEventual = 0;
-
-    user.incomes
-      .filter((income) => {
-        const date = new Date(income.date);
-        const month = getMonth(date) + 1;
-        const year = getYear(date);
-
-        return month === selectedMonth && year === selectedYear;
-      })
-      .forEach((income) => {
-        if (income.type.toLowerCase() === "recurrent") {
-          return (amountRecurrent += Number(income.value));
-        }
-        if (income.type.toLowerCase() === "eventual") {
-          return (amountEventual += Number(income.value));
-        }
-      });
-
-    return [
-      {
-        name: "Recurrent",
-        value: amountRecurrent,
-        color: "var(--chakra-colors-success-700)",
-      },
-      {
-        name: "Eventual",
-        value: amountEventual,
-        color: "var(--chakra-colors-success-500)",
-      },
-    ];
   }, [selectedMonth, selectedYear]);
 
   useEffect(() => {
@@ -213,7 +186,7 @@ export default function History({ user }: HomeProps) {
       minHeight={"calc(100vh - 8rem)"}
     >
       {/* Greeting & Balance */}
-      <Flex direction="row" gridGap={'1rem'} justify={'flex-end'} px={"1rem"}>
+      <Flex direction="row" gridGap={"1rem"} justify={"flex-end"} px={"1rem"}>
         <Filter
           defaultValue={selectedMonth}
           options={months}
@@ -226,28 +199,51 @@ export default function History({ user }: HomeProps) {
         />
       </Flex>
 
-      <Flex
-        flex={"auto 1 auto"}
-        direction={{ base: "column", lg: "row" }}
-        gridGap={{ base: "1.5rem", lg: "0" }}
-        justify={"space-between"}
-      >
-        <CardPieChart
-          title={"Inc & Exp"}
-          chartSide={"end"}
-          data={relationExpensesIncomes}
-        />
-        <CardPieChart
-          title={"Incomes"}
-          chartSide={"start"}
-          data={relationIncomes}
-        />
-        <CardPieChart
-          title={"Expenses"}
-          chartSide={"start"}
-          data={relationExpenses}
-        />
-      </Flex>
+      {dates.length === 0 && 
+        <Flex grow={1} shrink={1} direction={'column'} align={'center'} justify={'center'} textColor={'gray.500'}>
+          <Heading>Oops!</Heading>
+          <Text>There are no records on this date.</Text>
+        </Flex>
+      }
+
+      {dates.length !== 0 &&
+        dates.map((date) => {
+          return (
+            <Flex direction={"column"} key={date.date}>
+              <Text
+                fontSize={"0.75rem"}
+                textTransform={"uppercase"}
+                fontFamily={"mono"}
+                mb={"0.5rem"}
+                mx={"1rem"}
+                textColor={'gray.500'}
+              >
+                {date.dateFormatted}
+              </Text>
+              {listItems
+                .filter((item) => {
+                  return format(parseISO(item.date), "P") === date.date;
+                })
+                .map((activity, index) => {
+                  return (
+                    <ListItem
+                      key={index}
+                      type={activity.listType}
+                      title={activity?.title}
+                      account={activity?.account}
+                      date={activity?.date}
+                      value={activity.value}
+                      category={activity?.category}
+                      layout={"default"}
+                      origin={activity?.origin}
+                      destination={activity?.destination}
+                      coming={isAfter(parseISO(activity.date), new Date())}
+                    />
+                  );
+                })}
+            </Flex>
+          );
+        })}
     </Flex>
   );
 }

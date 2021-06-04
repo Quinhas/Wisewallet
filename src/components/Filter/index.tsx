@@ -14,12 +14,13 @@ export function Filter(props: FilterProps) {
   return (
     <>
       <Select
-        w={"25%"}
+        w={'auto'}
         icon={<FaFilter />}
         variant="filled"
         isFullWidth={false}
         onChange={props.onChange}
         defaultValue={props.defaultValue}
+        focusBorderColor={'primary.500'}
       >
         {props.options.map((option) => {
           return (
