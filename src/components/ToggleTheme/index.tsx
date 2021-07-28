@@ -1,13 +1,17 @@
-import { Button } from "@chakra-ui/button"
-import { useColorMode } from "@chakra-ui/color-mode"
+import { Button, IconButton } from "@chakra-ui/button";
+import { useColorMode } from "@chakra-ui/color-mode";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 export function ToggleTheme() {
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <header>
-      <Button colorScheme={'complementary'} onClick={toggleColorMode}>
-        Toggle {colorMode === "light" ? "Dark" : "Light"}
-      </Button>
-    </header>
-  )
+    <IconButton
+      aria-label="Toggle theme"
+      icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
+      onClick={toggleColorMode}
+      variant={'ghost'}
+      size="lg"
+      color="gray.400"
+    />
+  );
 }

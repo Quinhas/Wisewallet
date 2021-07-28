@@ -8,15 +8,9 @@
   <img src="https://img.shields.io/github/stars/Quinhas/Wisewallet?label=stars&message=MIT&color=5965E0&labelColor=121214" alt="Stars">
 </p>
 
-## 💻 Projeto
+## 💻 Project
 
 Wisewallet is an application to track your spending and manage your money developed for the purpose of studying the [technologies used](#Technologies).
-
-- [x] Aula 1
-- [x] Aula 2
-- [x] Aula 3
-- [x] Aula 4
-- [x] Aula 5
 
 ## ✨ Technologies
 
