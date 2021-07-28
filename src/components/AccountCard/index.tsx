@@ -35,7 +35,7 @@ export function AccountCard({
         <Flex
           align={"center"}
           justify={"center"}
-          bgColor={iconBgColor || "primary.600"}
+          bgColor={iconBgColor || "primaryApp.600"}
           w={"2rem"}
           h={"2rem"}
           borderRadius={"md"}
@@ -48,7 +48,7 @@ export function AccountCard({
         <Flex
           align={"center"}
           justify={"center"}
-          bgColor={iconBgColor || "primary.600"}
+          bgColor={iconBgColor || "primaryApp.600"}
           w={"2rem"}
           h={"2rem"}
           borderRadius={"md"}
@@ -61,7 +61,7 @@ export function AccountCard({
         <Flex
           align={"center"}
           justify={"center"}
-          bgColor={iconBgColor || "primary.600"}
+          bgColor={iconBgColor || "primaryApp.600"}
           w={"2rem"}
           h={"2rem"}
           borderRadius={"md"}

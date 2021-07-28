@@ -1,30 +1,18 @@
-import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/layout";
-import { GetStaticProps } from "next";
-import { useEffect, useMemo, useState } from "react";
-import CountUp from "react-countup";
+import { Box, Button, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import { AccountCard } from "@components/AccountCard";
-import { api } from "@services/api";
-import { getHours, isAfter, isBefore, parseISO } from "date-fns";
-import { IUser } from "src/types/IUser";
-import { ListItem } from "@components/ListItem";
-import * as localForage from "localforage";
-import { useColorMode } from "@chakra-ui/color-mode";
+import { Navbar } from "@components/Navbar";
+import { Tabs } from "@components/Tabs";
+import { useAuth } from "@hooks/useAuth";
+import { useHistory } from "@hooks/useHistory";
+import { getHours } from "date-fns";
+import { useRouter } from "next/router";
+import React, { useMemo } from "react";
+import CountUp from "react-countup";
 
-type HomeProps = {
-  user: IUser;
-  recent: any;
-  coming: any;
-};
-
-export default function Home({ user, recent, coming }: HomeProps) {
-  const [balance, setBalance] = useState<number>(0);
-  const { colorMode } = useColorMode();
-
-  useEffect(() => {
-    let balance = user.accounts.reduce((a, b) => a + b.balance, 0);
-    setBalance(balance);
-    localForage.setItem("wisewallet_language", user.language);
-  }, []);
+export default function Home() {
+  const { user } = useAuth();
+  const { balance, accounts } = useHistory();
+  const router = useRouter();
 
   const greeting = useMemo(() => {
     const hour = getHours(new Date());
@@ -56,188 +44,125 @@ export default function Home({ user, recent, coming }: HomeProps) {
       };
     }
 
-    return "Hello";
+    return {
+      default: "Hello",
+    };
   }, []);
 
+  if (!user) {
+    router.push("/login");
+    return;
+  }
+
   return (
-    <Flex
-      py={"1rem"}
-      direction="column"
-      gridGap={"1rem"}
-      minHeight={"calc(100vh - 8rem)"}
-    >
-      {/* Greeting & Balance */}
-      <Flex direction="column" px={"1rem"}>
-        <Text fontWeight="medium" fontSize={"1.5rem"}>
-          {greeting[user.language]}, {user.name.split(" ")[0]}!
-        </Text>
-        <Flex justify={"space-between"} fontSize={"1.5rem"}>
-          <Text color={"gray.500"}>
-            {user.language === "pt-BR" && "Saldo:"}
-            {user.language === "en-US" && "Balance:"}
+    <>
+      <Navbar />
+      <Flex py={"1rem"} direction="column" gridGap={"1rem"} grow={1}>
+        {/* Greeting & Balance */}
+        <Flex direction="column" px={"1rem"}>
+          <Text fontWeight="medium" fontSize={"1.5rem"}>
+            {greeting[user.language]}, {user.name.split(" ")[0]}!
           </Text>
-          <Text color={"primary.600"} fontWeight="bold">
-            <CountUp
-              preserveValue={true}
-              end={balance}
-              decimals={2}
-              decimal=","
-              prefix="R$ "
-              duration={0.5}
-            />
-          </Text>
-        </Flex>
-      </Flex>
-
-      {/* Accounts & Cards */}
-      <Flex
-        direction={"row"}
-        gridGap={"1rem"}
-        mx={"1rem"}
-        pb={"0.5rem"}
-        overflowX={"auto"}
-        justify={"space-between"}
-        shrink={1}
-        css={{
-          "&::-webkit-scrollbar": {
-            display: 'none'
-          }
-        }}
-      >
-        {user.accounts.map((account, index) => {
-          return (
-            <AccountCard
-              key={index}
-              type={account.type}
-              value={account.balance}
-              name={account.name || null}
-            />
-          );
-        })}
-      </Flex>
-
-      {coming.length != 0 && (
-        <>
-          <Flex direction={"column"} mx={"1rem"}>
-            <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
-              {user.language === "pt-BR" && "Próximo"}
-              {user.language === "en-US" && "Coming"}
-            </Heading>
-            <Box>
-              {coming.map((activity, index) => {
-                return (
-                  <ListItem
-                    key={index}
-                    type={activity.listType}
-                    title={activity?.title}
-                    account={activity?.account}
-                    date={activity?.date}
-                    value={activity.value}
-                    category={activity?.category}
-                    layout={"home"}
-                    origin={activity?.origin}
-                    destination={activity?.destination}
-                    coming={isAfter(parseISO(activity.date), new Date())}
-                  />
-                );
-              })}
-            </Box>
+          <Flex justify={"space-between"} fontSize={"1.5rem"}>
+            <Text color={"gray.500"}>
+              {user.language === "pt-BR" && "Saldo:"}
+              {user.language === "en-US" && "Balance:"}
+            </Text>
+            <Text color={"primaryApp.600"} fontWeight="bold">
+              <CountUp
+                preserveValue={true}
+                end={balance}
+                decimals={2}
+                decimal=","
+                prefix="R$ "
+                duration={0.5}
+              />
+            </Text>
           </Flex>
-          <Divider w={'calc(100% - 2rem)'} mx={'1rem'} mt={"0.6rem"} />
-        </>
-      )}
+        </Flex>
 
-      <Flex direction={"column"} mx={"1rem"}>
-        <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
-          {user.language === "pt-BR" && "Recente"}
-          {user.language === "en-US" && "Recent"}
-        </Heading>
-        {recent.map((activity, index) => {
-          return (
-            <ListItem
-              key={index}
-              type={activity.listType}
-              title={activity?.title}
-              account={activity?.account}
-              date={activity?.date}
-              value={activity.value}
-              category={activity?.category}
-              layout={"home"}
-              origin={activity?.origin}
-              destination={activity?.destination}
-            />
-          );
-        })}
+        {/* Accounts & Cards */}
+        <Flex
+          direction={"row"}
+          gridGap={"1rem"}
+          mx={"1rem"}
+          pb={"0.5rem"}
+          overflowX={"auto"}
+          justify={"space-between"}
+          shrink={1}
+          css={{
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
+          {accounts.map((account, index) => {
+            return (
+              <AccountCard
+                key={index}
+                type={account.type}
+                value={account.balance}
+                name={account.name}
+              />
+            );
+          })}
+        </Flex>
+
+        {/* {coming.length != 0 && (
+          <>
+            <Flex direction={"column"} mx={"1rem"}>
+              <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
+                {user.language === "pt-BR" && "Próximo"}
+                {user.language === "en-US" && "Coming"}
+              </Heading>
+              <Box>
+                {coming.map((activity, index) => {
+                  return (
+                    <ListItem
+                      key={index}
+                      type={activity.listType}
+                      title={activity?.title}
+                      account={activity?.account}
+                      date={activity?.date}
+                      value={activity.value}
+                      category={activity?.category}
+                      layout={"home"}
+                      origin={activity?.origin}
+                      destination={activity?.destination}
+                      coming={isAfter(parseISO(activity.date), new Date())}
+                    />
+                  );
+                })}
+              </Box>
+            </Flex>
+            <Divider w={"calc(100% - 2rem)"} mx={"1rem"} mt={"0.6rem"} />
+          </>
+        )}
+
+        <Flex direction={"column"} mx={"1rem"}>
+          <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
+            {user.language === "pt-BR" && "Recente"}
+            {user.language === "en-US" && "Recent"}
+          </Heading>
+          {recent.map((activity, index) => {
+            return (
+              <ListItem
+                key={index}
+                type={activity.listType}
+                title={activity?.title}
+                account={activity?.account}
+                date={activity?.date}
+                value={activity.value}
+                category={activity?.category}
+                layout={"home"}
+                origin={activity?.origin}
+                destination={activity?.destination}
+              />
+            );
+          })}
+        </Flex> */}
       </Flex>
-    </Flex>
+      <Tabs />
+    </>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const { data } = await api.get("users/0");
-  const comingIncomes = [];
-  const comingExpenses = [];
-  const comingTransfers = [];
-  const recentIncomes = [];
-  const recentExpenses = [];
-  const recentTransfers = [];
-
-  data.incomes.splice(0, 5).forEach((income) => {
-    if (isBefore(parseISO(income.date), new Date())) {
-      recentIncomes.push({ ...income, listType: "Income" });
-    }
-    if (isAfter(parseISO(income.date), new Date())) {
-      comingIncomes.push({ ...income, listType: "Income" });
-    }
-  });
-
-  data.expenses.splice(0, 5).forEach((expense) => {
-    if (isBefore(parseISO(expense.date), new Date())) {
-      recentExpenses.push({ ...expense, listType: "Expense" });
-    }
-    if (isAfter(parseISO(expense.date), new Date())) {
-      comingExpenses.push({ ...expense, listType: "Expense" });
-    }
-  });
-  
-  data.transfers.splice(0, 5).map((transfer) => {
-    if (isBefore(parseISO(transfer.date), new Date())) {
-      recentTransfers.push({ ...transfer, listType: "Transfer" });
-    }
-    if (isAfter(parseISO(transfer.date), new Date())) {
-      comingTransfers.push({ ...transfer, listType: "Transfer" });
-    }
-  });
-
-  const recent = [...recentIncomes, ...recentExpenses, ...recentTransfers]
-    .sort((a, b) => {
-      if (a.date < b.date) {
-        return 1;
-      }
-      if (a.date > b.date) {
-        return -1;
-      }
-      return 0;
-    })
-    .splice(0, 5);
-
-  const coming = [...comingIncomes, ...comingExpenses, ...comingTransfers]
-    .sort((a, b) => {
-      if (a.date < b.date) {
-        return 1;
-      }
-      if (a.date > b.date) {
-        return -1;
-      }
-      return 0;
-    })
-    .splice(0, 5);
-
-  return {
-    props: {
-      user: data,
-      recent: recent,
-      coming: coming,
-    },
-  };
-};

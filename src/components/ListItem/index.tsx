@@ -37,7 +37,7 @@ export function ListItem({
 }: ListItemProps) {
   const { colorMode } = useColorMode();
 
-  const [locale, setLocale] = useState<Locale>(null);
+  const [locale, setLocale] = useState<Locale>();
 
   const getLocale = async () => {
     const language = await localForage.getItem('wisewallet_language');
@@ -97,7 +97,7 @@ export function ListItem({
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(value)}
+                  }).format(value ?? 0)}
                 </Text>
                 <Text
                   fontFamily={"mono"}
@@ -138,7 +138,7 @@ export function ListItem({
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(value)}
+                  }).format(value ?? 0)}
                 </Text>
                 <Text
                   fontFamily={"mono"}
@@ -186,7 +186,7 @@ export function ListItem({
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(value)}
+                  }).format(value ?? 0)}
                 </Text>
               </Flex>
             </>
