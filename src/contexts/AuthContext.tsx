@@ -47,6 +47,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      setLoading(true);
       if (user) {
         const { displayName, photoURL, uid, email } = user;
         const newUser = {
@@ -77,6 +78,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
         setIsLogged(true);
         setLoading(false);
       } else {
+        Router.replace("/login");
         setIsLogged(false);
         setUser(undefined);
         setLoading(false);
@@ -133,7 +135,6 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
   }
 
   if (loading) {
-    console.log("oi");
     return (
       <Flex w={"100vw"} h={"100vh"} align={"center"} justify={"center"}>
         <Flex

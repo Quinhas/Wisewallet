@@ -1,8 +1,9 @@
 import { useColorMode } from "@chakra-ui/color-mode";
 import { Flex, Heading, Text } from "@chakra-ui/layout";
 import { format, parseISO } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as localForage from "localforage";
+import { useAuth } from "@hooks/useAuth";
 
 type ListItemProps = {
   type: "Income" | "Expense" | "Transfer";
@@ -12,15 +13,15 @@ type ListItemProps = {
   value?: number;
   origin?: string;
   destination?: string;
-  date: string;
+  date: Date;
   layout: string;
-  coming?: boolean
+  coming?: boolean;
 };
 
 const color = {
   Expense: "danger.600",
   Income: "success.600",
-  Transfer: "primary.600",
+  Transfer: "primaryApp.600",
 };
 
 export function ListItem({
@@ -33,23 +34,25 @@ export function ListItem({
   destination,
   date,
   layout,
-  coming
+  coming,
 }: ListItemProps) {
   const { colorMode } = useColorMode();
-
+  const { user } = useAuth();
   const [locale, setLocale] = useState<Locale>();
 
-  const getLocale = async () => {
-    const language = await localForage.getItem('wisewallet_language');
+  useMemo(async () => {
+    if (!user?.language) {
+      const locale: Locale = (await import(`date-fns/locale/en-US/index.js`))
+        .default;
+      setLocale(locale);
+      return;
+    }
     const locale: Locale = (
-      await import(`date-fns/locale/${language}/index.js`)
+      await import(`date-fns/locale/${user.language}/index.js`)
     ).default;
     setLocale(locale);
-  };
+  }, [user?.language]);
 
-  useEffect(() => {
-    getLocale();
-  }, []);
   return (
     <>
       <Flex
@@ -59,8 +62,8 @@ export function ListItem({
         borderLeftWidth={"0.5rem"}
         borderLeftColor={color[type]}
         borderBottomWidth={"0.5px"}
-        borderBottomColor={colorMode === "light" ? "gray.200" : "gray.700"}
-        opacity={coming ? "0.6" : '1'}
+        borderBottomColor={colorMode === "light" ? "gray.200" : "gray.900"}
+        opacity={coming ? "0.6" : "1"}
       >
         <Flex
           grow={1}
@@ -84,7 +87,7 @@ export function ListItem({
                 >
                   {category}{" "}
                   {layout === "home" &&
-                    `- ${format(parseISO(date), "Pp", { locale: locale })}`}
+                    `- ${format(date, "Pp", { locale: locale })}`}
                 </Text>
               </Flex>
               <Flex direction={"column"} textAlign={"end"}>
@@ -124,7 +127,7 @@ export function ListItem({
                     fontSize={"0.8rem"}
                     textTransform={"uppercase"}
                   >
-                    {format(parseISO(date), "Pp", { locale: locale })}
+                    {format(date, "Pp", { locale: locale })}
                   </Text>
                 )}
               </Flex>

@@ -1,3 +1,4 @@
+import { parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { database } from "src/services/firebase";
 import { useAuth } from "./useAuth";
@@ -11,29 +12,32 @@ type AccountProps = {
 
 type ExpenseProps = {
   id: string;
-  date: string;
+  date: Date;
   title: string;
   account: string;
   category: string;
   value: number;
   type: string;
+  listType: "Expense";
 };
 
 type IncomeProps = {
   id: string;
-  date: string;
+  date: Date;
+  value: number;
   title: string;
   account: string;
-  value: number;
   type: string;
+  listType: "Income";
 };
 
 type TransferProps = {
   id: string;
-  date: string;
+  date: Date;
+  value: number;
   origin: string;
   destination: string;
-  value: number;
+  listType: "Transfer";
 };
 
 type FirebaseUser = {
@@ -91,6 +95,9 @@ export function useHistory() {
   const [expenses, setExpenses] = useState<ExpenseProps[]>([]);
   const [incomes, setIncomes] = useState<IncomeProps[]>([]);
   const [transfers, setTransfers] = useState<TransferProps[]>([]);
+  const [list, setList] = useState<
+    (ExpenseProps | IncomeProps | TransferProps)[]
+  >([]);
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
@@ -122,12 +129,13 @@ export function useHistory() {
         ([key, value]) => {
           return {
             id: key,
-            date: value.date,
+            date: parseISO(value.date),
             title: value.title,
             account: value.account,
             category: value.category,
             value: value.value,
             type: value.type,
+            listType: "Expense",
           };
         }
       );
@@ -137,11 +145,12 @@ export function useHistory() {
         ([key, value]) => {
           return {
             id: key,
-            date: value.date,
+            date: parseISO(value.date),
             title: value.title,
             account: value.account,
             value: value.value,
             type: value.type,
+            listType: "Income",
           };
         }
       );
@@ -151,14 +160,30 @@ export function useHistory() {
         ([key, value]) => {
           return {
             id: key,
-            date: value.date,
+            date: parseISO(value.date),
             origin: value.origin,
             destination: value.destination,
             value: value.value,
+            listType: "Transfer",
           };
         }
       );
       setTransfers(parsedTransfers);
+
+      const list = [
+        ...parsedIncomes,
+        ...parsedExpenses,
+        ...parsedTransfers,
+      ].sort((a, b) => {
+        if (a.date < b.date) {
+          return 1;
+        }
+        if (a.date > b.date) {
+          return -1;
+        }
+        return 0;
+      });
+      setList(list);
 
       const balance = parsedAccounts.reduce((a, b) => a + b.balance, 0);
       setBalance(balance);
@@ -169,5 +194,5 @@ export function useHistory() {
     };
   }, [user?.id]);
 
-  return { expenses, incomes, transfers, accounts, balance };
+  return { expenses, incomes, transfers, accounts, balance, list };
 }

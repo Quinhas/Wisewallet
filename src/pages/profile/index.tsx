@@ -1,6 +1,18 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { useColorMode } from "@chakra-ui/color-mode";
 import { Flex, Heading, Text } from "@chakra-ui/layout";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogCloseButton,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import { Navbar } from "@components/Navbar";
 import { Tabs } from "@components/Tabs";
 import { useAuth } from "@hooks/useAuth";
@@ -9,7 +21,8 @@ import { format, parseISO } from "date-fns";
 
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { FaSignOutAlt } from "react-icons/fa";
 
 type InfoProps = {
   title: string;
@@ -18,6 +31,7 @@ type InfoProps = {
 
 const Info = ({ title, value }: InfoProps) => {
   const { colorMode } = useColorMode();
+
   return (
     <Flex direction={"column"} px={"1rem"}>
       <Heading
@@ -38,11 +52,13 @@ const Info = ({ title, value }: InfoProps) => {
 };
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>();
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
-  const getLocale = async () => {
+  useMemo(async () => {
     if (!user?.language) {
       const locale: Locale = (await import(`date-fns/locale/en-US/index.js`))
         .default;
@@ -53,11 +69,7 @@ export default function Profile() {
       await import(`date-fns/locale/${user.language}/index.js`)
     ).default;
     setLocale(locale);
-  };
-
-  useEffect(() => {
-    getLocale();
-  }, []);
+  }, [user?.language]);
 
   const language = useMemo(() => {
     switch (user?.language) {
@@ -74,6 +86,24 @@ export default function Profile() {
     router.push("/login");
     return;
   }
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await router.push("/");
+      await signOut();
+      toast({
+        description: "User logged out successfully.",
+        status: "success",
+      });
+    } catch (error) {
+      toast({
+        description: error.message,
+        status: "error",
+      });
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -125,6 +155,15 @@ export default function Profile() {
         />
         <Info title={"Currency"} value={user.currency} />
         <Info title={"Language"} value={language} />
+        <Button
+          mx={"1rem"}
+          colorScheme={"primaryApp"}
+          rightIcon={<FaSignOutAlt />}
+          onClick={handleLogout}
+          isLoading={isLoading}
+        >
+          Log Out
+        </Button>
       </Flex>
       <Tabs />
     </>

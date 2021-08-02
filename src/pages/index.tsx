@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, Spinner, Text, useColorMode } from "@chakra-ui/react";
 import { AccountCard } from "@components/AccountCard";
 import { Navbar } from "@components/Navbar";
 import { Tabs } from "@components/Tabs";
@@ -6,13 +6,14 @@ import { useAuth } from "@hooks/useAuth";
 import { useHistory } from "@hooks/useHistory";
 import { getHours } from "date-fns";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import CountUp from "react-countup";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLogged } = useAuth();
   const { balance, accounts } = useHistory();
   const router = useRouter();
+  const { colorMode } = useColorMode();
 
   const greeting = useMemo(() => {
     const hour = getHours(new Date());
@@ -49,66 +50,92 @@ export default function Home() {
     };
   }, []);
 
-  if (!user) {
-    router.push("/login");
-    return;
-  }
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+  }, [router, user]);
 
   return (
     <>
       <Navbar />
-      <Flex py={"1rem"} direction="column" gridGap={"1rem"} grow={1}>
-        {/* Greeting & Balance */}
-        <Flex direction="column" px={"1rem"}>
-          <Text fontWeight="medium" fontSize={"1.5rem"}>
-            {greeting[user.language]}, {user.name.split(" ")[0]}!
-          </Text>
-          <Flex justify={"space-between"} fontSize={"1.5rem"}>
-            <Text color={"gray.500"}>
-              {user.language === "pt-BR" && "Saldo:"}
-              {user.language === "en-US" && "Balance:"}
-            </Text>
-            <Text color={"primaryApp.600"} fontWeight="bold">
-              <CountUp
-                preserveValue={true}
-                end={balance}
-                decimals={2}
-                decimal=","
-                prefix="R$ "
-                duration={0.5}
-              />
-            </Text>
+      {!user && (
+        <Flex grow={1} align={"center"} justify={"center"}>
+          <Flex
+            direction={"column"}
+            align="center"
+            gridGap={"1.5rem"}
+            bg={colorMode === "light" ? "white" : "black"}
+            boxShadow={"md"}
+            py={"2rem"}
+            px={"4rem"}
+            borderRadius={"md"}
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+            <Text color="gray.500">Carregando...</Text>
           </Flex>
         </Flex>
+      )}
+      {user && (
+        <Flex py={"1rem"} direction="column" gridGap={"1rem"} grow={1}>
+          {/* Greeting & Balance */}
+          <Flex direction="column" px={"1rem"}>
+            <Text fontWeight="medium" fontSize={"1.5rem"}>
+              {greeting[user.language]}, {user.name.split(" ")[0]}!
+            </Text>
+            <Flex justify={"space-between"} fontSize={"1.5rem"}>
+              <Text color={"gray.500"}>
+                {user.language === "pt-BR" && "Saldo:"}
+                {user.language === "en-US" && "Balance:"}
+              </Text>
+              <Text color={"primaryApp.600"} fontWeight="bold">
+                <CountUp
+                  preserveValue={true}
+                  end={balance}
+                  decimals={2}
+                  decimal=","
+                  prefix="R$ "
+                  duration={0.5}
+                />
+              </Text>
+            </Flex>
+          </Flex>
 
-        {/* Accounts & Cards */}
-        <Flex
-          direction={"row"}
-          gridGap={"1rem"}
-          mx={"1rem"}
-          pb={"0.5rem"}
-          overflowX={"auto"}
-          justify={"space-between"}
-          shrink={1}
-          css={{
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-          }}
-        >
-          {accounts.map((account, index) => {
-            return (
-              <AccountCard
-                key={index}
-                type={account.type}
-                value={account.balance}
-                name={account.name}
-              />
-            );
-          })}
-        </Flex>
+          {/* Accounts & Cards */}
+          <Flex
+            direction={"row"}
+            gridGap={"1rem"}
+            mx={"1rem"}
+            pb={"0.5rem"}
+            overflowX={"auto"}
+            justify={"space-between"}
+            shrink={1}
+            css={{
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            {accounts.map((account, index) => {
+              return (
+                <AccountCard
+                  key={index}
+                  type={account.type}
+                  value={account.balance}
+                  name={account.name}
+                />
+              );
+            })}
+          </Flex>
 
-        {/* {coming.length != 0 && (
+          {/* {coming.length != 0 && (
           <>
             <Flex direction={"column"} mx={"1rem"}>
               <Heading fontSize={"1.6rem"} mb={"0.5rem"}>
@@ -161,7 +188,8 @@ export default function Home() {
             );
           })}
         </Flex> */}
-      </Flex>
+        </Flex>
+      )}
       <Tabs />
     </>
   );

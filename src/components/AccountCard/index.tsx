@@ -30,6 +30,7 @@ export function AccountCard({
       borderRadius={"md"}
       boxShadow={"md"}
       flex={"1 1 auto"}
+      minW={['calc(100% / 2 - 2rem)', 'calc(100% / 5 - 2rem)']}
     >
       {type === "Cash" && (
         <Flex
