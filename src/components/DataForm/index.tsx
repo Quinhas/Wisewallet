@@ -129,7 +129,6 @@ const InnerForm = (props: OtherProps & FormikProps<FormValues>) => {
 
       <Button
         type="submit"
-        variant={"app"}
         w={"100%"}
         mt={"1rem"}
         rightIcon={<FaSignInAlt />}

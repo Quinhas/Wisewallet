@@ -59,7 +59,7 @@ export default function Login() {
               h={"2.875rem"}
               fontWeight={500}
             >
-              Faça login com o Google
+              Login with google
             </Button>
           </LightMode>
           <Flex
@@ -85,7 +85,7 @@ export default function Login() {
               marginLeft: "1rem",
             }}
           >
-            ou
+            or
           </Flex>
           <LoginForm />
         </Flex>

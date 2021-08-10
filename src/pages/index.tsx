@@ -1,4 +1,13 @@
-import { Box, Button, Divider, Flex, Heading, Spinner, Text, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  Spinner,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import { AccountCard } from "@components/AccountCard";
 import { Navbar } from "@components/Navbar";
 import { Tabs } from "@components/Tabs";
@@ -123,13 +132,14 @@ export default function Home() {
               },
             }}
           >
-            {accounts.map((account, index) => {
+            {accounts.map((account) => {
               return (
                 <AccountCard
-                  key={index}
+                  key={account.id}
                   type={account.type}
                   value={account.balance}
                   name={account.name}
+                  id={account.id}
                 />
               );
             })}

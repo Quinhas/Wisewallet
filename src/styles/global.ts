@@ -4,22 +4,34 @@ import { mediaQueries, scrollbar } from "./custom";
 
 const theme = extendTheme({
   components: {
-    Button: {
+    MenuItem: {
+      baseStyle: (props) => ({
+        display: "flex",
+        alignItems: "center",
+        fontWeight: 500,
+        height: "auto",
+        px: "0.5rem",
+        py: "0.7rem",
+        grow: 1,
+        width: "100%",
+        borderRadius: "md",
+        justifyContent: "flex-start",
+        cursor: "pointer",
+        color: mode("primaryApp.500", "primaryApp.200")(props),
+        transition: "0.2s",
+        _hover: {
+          backgroundColor: mode("blackAlpha.200", "whiteAlpha.400")(props),
+        },
+        border: "1px solid",
+        borderColor: "primaryApp.200",
+      }),
       variants: {
-        app: (props) => ({
-          height: "2.875rem",
-          borderRadius: "0.5rem",
-          fontWeight: 500,
-          background: "primaryApp.500",
-          color: "whiteAlpha.900",
-          padding: "0 2rem",
-          transition: "filter 0.2s",
-          "&:not(:disabled):hover": {
-            filter: "brightness(0.9)",
-          },
-          "&:disabled:hover": {
-            background: "primaryApp.500",
-            color: "whiteAlpha.900",
+        active: (props) => ({
+          backgroundColor: "primaryApp.100",
+          color: "primaryApp.900",
+          _hover: {
+            backgroundColor: "secondaryApp.100",
+            color: "secondaryApp.900",
           },
         }),
       },
