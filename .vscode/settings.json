@@ -1,0 +1,11 @@
+{
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#7869E2",
+    "titleBar.inactiveBackground": "#7869E2",
+    "titleBar.activeForeground": "#000",
+    "titleBar.inactiveForeground": "#000"
+  },
+  "cSpell.words": [
+    "Wisewallet"
+  ]
+}

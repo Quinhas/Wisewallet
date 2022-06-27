@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 26.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Camada_1" xmlns:svgjs="http://svgjs.com/svgjs"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"
+	 style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#7869E2;}
+	.st1{fill:#523FD9;}
+	.st2{fill:#3925BF;}
+	.st3{fill:#F9CE53;}
+</style>
+<g>
+	<path class="st0" d="M438.2,44.3H73.8C33.1,44.3,0,77.4,0,118.2v275.7c0,40.7,33.1,73.8,73.8,73.8h364.3
+		c40.7,0,73.8-33.1,73.8-73.8V118.2C512,77.4,478.9,44.3,438.2,44.3z"/>
+	<path class="st1" d="M438.2,44.3H256v423.4h182.2c40.7,0,73.8-33.1,73.8-73.8V118.2C512,77.4,478.9,44.3,438.2,44.3z"/>
+	<path class="st2" d="M512,182.2H375.1c-40.7,0-74.4,32.5-74.8,73.1c-0.4,41.1,32.9,74.6,73.8,74.6H512V182.2z"/>
+	<path class="st3" d="M393.8,270.8h-19.7c-8.2,0-14.8-6.6-14.8-14.8s6.6-14.8,14.8-14.8h19.7c8.2,0,14.8,6.6,14.8,14.8
+		C408.6,264.2,402,270.8,393.8,270.8z"/>
+</g>
+</svg>
